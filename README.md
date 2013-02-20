@@ -50,7 +50,7 @@ Example output:
 Both the example input and output PMX data will produce this image in the SCORE editor:
 
 <center>
-![IMAGE](example/example.svg?raw=true)
+![IMAGE](http://htmlpreview.github.com/?https://github.com/craigsapp/prettypmx/blob/master/example/example.svg)
 </center>
 
 
