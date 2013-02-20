@@ -47,7 +47,7 @@ Example output:
 14 1 41.700
 </pre>
 
-Both the example input and output PMX data will produce this image in the SCORE editor:
+Both the example input and output PMX data will produce this image in the SCORE editor (loaded with the REad command):
 
 <center>
 ![Example notation](example/example.png?raw=true)
