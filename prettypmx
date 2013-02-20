@@ -1,0 +1,363 @@
+#!/usr/bin/perl
+#
+# Programmer:    Craig Stuart Sapp <craig.stanford.edu>
+# Creation Date: Sat Feb 25 09:10:04 PST 2012
+# Last Modified: Sat Feb 25 09:10:04 PST 2012
+# Filename:      prettypmx
+# Syntax:        perl 5
+#
+# Description:   Aligns parameter matrices of SCORE PMX data.  Trailing
+#                zeros in fractional portations are adjusted so that
+#                each column contains the same number of fractional
+#                digits (for readability and compactness).
+#
+# Example input:
+#
+# 8.  1.0    .000      .00      .60   200.00
+# 14.  1.0    .000     2.00
+# 14.  1.0    .000
+# 14.  1.0    .000     2.00     8.00
+# 3.  1.0   1.200      .00     1.00
+# 18.  1.0   5.700      .00    99.00     1.00
+# 1.  1.0  11.640     8.00    20.00      .00     1.0000
+# 1.  1.0  11.640    12.00    10.00      .00     1.0000    -1.50
+# 14.  1.0  15.788     2.00
+# 1.  1.0  17.618    11.00    20.00      .00     1.0000
+# 1.  1.0  17.620    11.00    10.00      .00      .5000    -1.00      .00
+# 6.  1.0  17.620    10.00     9.00    21.76    11.0000
+# 1.  1.0  21.758    10.00    12.00      .00      .5000    -1.00      .00
+# 1.  1.0  25.897     4.00    20.00      .00     1.0000    -1.50
+# 1.  1.0  25.900     9.00    12.00      .00     1.0000    -1.00
+# 1.  1.0  33.027     8.00    20.00      .00     1.0000      .00      .00      .00   -14.00
+# 1.  1.0  33.028    10.00    10.00      .00     1.0000    -1.50
+# 1.  1.0  37.552     7.00    20.00      .00     1.0000
+# 1.  1.0  37.553    12.00    10.00      .00     1.0000    -1.50
+# 14.  1.0  41.700     2.00
+#
+# Example output:
+#
+# 8  1  0.000  0  0.6 200.00
+# 14 1  0.000  2
+# 14 1  0.000
+# 14 1  0.000  2  8.0
+# 3  1  1.200  0  1.0
+# 18 1  5.700  0 99.0   1.00
+# 1  1 11.640  8 20.0   0.00  1.0
+# 1  1 11.640 12 10.0   0.00  1.0 -1.5
+# 14 1 15.788  2
+# 1  1 17.618 11 20.0   0.00  1.0
+# 1  1 17.620 11 10.0   0.00  0.5 -1.0
+# 6  1 17.620 10  9.0  21.76 11.0
+# 1  1 21.758 10 12.0   0.00  0.5 -1.0
+# 1  1 25.897  4 20.0   0.00  1.0 -1.5
+# 1  1 25.900  9 12.0   0.00  1.0 -1.0
+# 1  1 33.027  8 20.0   0.00  1.0  0.0 0 0 -14
+# 1  1 33.028 10 10.0   0.00  1.0 -1.5
+# 1  1 37.552  7 20.0   0.00  1.0
+# 1  1 37.553 12 10.0   0.00  1.0 -1.5
+# 14 1 41.700  2
+#
+
+use strict;
+
+# $COLUMNSPACE is the text which separates each column of parameters.
+my $COLUMNSPACE = " ";
+
+my @contents = <>;
+@contents = cleanContents(@contents);
+
+my $i;
+my $j;
+my $textnext;
+my @data;
+my $line;
+for ($i=0; $i<@contents; $i++) {
+   $line = $contents[$i];
+   chomp $line;
+   @data = split(/\t/, $line);
+   if ($line =~ /^\s*t/i) {
+      $textnext = 1;
+   } else {
+      $textnext = 0;
+   }
+   for ($j=0; $j<@data; $j++) {
+      print $data[$j];
+      if ($j <@data-1) {
+         print $COLUMNSPACE;
+      }
+   }
+   print "\n";
+
+   if ($textnext) {
+      chomp $contents[$i+1];
+      print "$contents[$i+1]\n";
+      $i++;
+   }
+}
+
+################################################################################
+
+
+##############################
+##
+## cleanContents --
+##
+
+sub cleanContents {
+   my @input = @_;
+   my @output;
+
+   my $i;
+   my $j;
+   my $textnext;
+   my $line;
+   my @data;
+   my $value;
+   my $lout;
+   my @fracdig;
+
+   for ($i=0; $i<@input; $i++) {
+      $line = $input[$i];
+      chomp $line;
+      if ($line =~ /^\s*t\s/i) {
+         $textnext = 1;
+      } else {
+         $textnext = 0;
+         if ($line !~ /^\s*\d/) {
+            $line =~ s/\s+$//;
+            $input[$i] = $line;
+            next;
+         }
+      }
+      $line =~ s/^\s+//;
+      $line =~ s/\s+$//;
+      @data = split(/\s+/, $line);
+      $lout = "";
+      for ($j=0; $j<@data; $j++) {
+         $value = $data[$j];
+         if ($value =~ /t/i) {
+            $lout .= "\t$value";
+         } else  {
+            if ($value =~ /^\./) {
+               $value = "0$value";
+            } elsif ($value =~ /^-\./) {
+               $value =~ s/^-\.//;
+               $value = "-0.$value";
+            }
+            if ($value =~ /\./) {
+               # remove trailing zeros after decimal point
+               $value =~ s/0+$//;
+            }
+            $lout .= "\t$value";
+            $fracdig[$j] = getMaxFractionalDigits($value, $fracdig[$j]);
+         }
+      }
+      $lout =~ s/^\s+//;
+      $input[$i] = $lout;
+      if ($textnext) {
+         $input[$i+1] =~ s/[\r\n]+$//;
+         $i++;
+      }
+   }
+
+   # Remove trailing zeros but keep at least the first four values.
+
+   for ($i=0; $i<@input; $i++) {
+      $line = $input[$i];
+      chomp $line;
+      if ($line =~ /^\s*t/i) {
+         $textnext = 1;
+      } else {
+         $textnext = 0;
+         if ($line !~ /^\s*\d/) {
+            next;
+         }
+      }
+      $line =~ s/^\s+//;
+      $line =~ s/\s+$//;
+      @data = split(/\s+/, $line);
+      for ($j=$#data; $j>=4; $j--) {
+         if ($data[$j] == 0) {
+            pop(@data);
+         } else {
+            last;
+         }
+      }
+      $lout = "";
+      for ($j=0; $j<@data; $j++) {
+         $lout .= "\t$data[$j]";
+      }
+      $lout =~ s/^\t//;
+      $input[$i] = $lout;
+      $i++ if $textnext;
+   }
+
+   # Add trailing zeros if needed to match fracdig for each column.
+
+   my $tval;
+   my $digits;
+   my $add;
+   my $k;
+   for ($i=0; $i<@input; $i++) {
+      $line = $input[$i];
+      if ($line =~ /^\s*t/i) {
+         $textnext = 1;
+      } else {
+         $textnext = 0;
+         if ($line !~ /^\s*\d/) {
+            next;
+         }
+      }
+      $line =~ s/^\s+//;
+      $line =~ s/\s+$//;
+      @data = split(/\s+/, $line);
+      $lout = "";
+      for ($j=0; $j<@data; $j++) {
+         $value = $data[$j];
+         if ($value =~ /t/i) {
+            $lout .= "\t$value";
+         } else {
+            if ($fracdig[$j] == 0) {
+               $value =~ s/\.$//;
+               $lout .= "\t$value";
+               next;
+            }
+      
+            $value =~ /\.(\d*)$/;
+            $tval = $1;
+            $digits = length($tval);
+            $add = $fracdig[$j] - $digits;
+            if (($add > 0) && ($value !~ /\./)) {
+               $value .= ".";
+            }
+            for ($k=0; $k<$add; $k++) {
+               $value .= "0";
+            }
+            $lout .= "\t$value";
+         }
+      }
+      $lout =~ s/^\s+//;
+      $input[$i] = $lout;
+      $i++ if $textnext;
+      #print "$input[$i]\n";
+      #if ($text#next) {
+      #   print "$input[$i+1]\n";
+      #   $i++;
+      #}
+   }
+
+   # Count left-hand characters max for each column.
+
+   my @ldigits;
+   for ($i=0; $i<@input; $i++) {
+      $line = $input[$i];
+      if ($line =~ /^\s*t/i) {
+         $textnext = 1;
+      } else {
+         $textnext = 0;
+         if ($line !~ /^\s*\d/) {
+            next;
+         }
+      }
+      $line =~ s/^\s+//;
+      $line =~ s/\s+$//;
+      @data = split(/\s+/, $line);
+      $lout = "";
+      for ($j=0; $j<@data; $j++) {
+         $value = $data[$j];
+         $value =~ /^([-\d]+)\.?$/;
+         $tval = $value;
+         $tval =~ s/\..*//;
+         die "value = $value, before decimal: $tval" if $tval =~ /^\s*$/;
+         $digits = length($tval);
+         $ldigits[$j] = 0 if $ldigits[$j] =~ /^\s*$/;
+   
+         $ldigits[$j] = $digits if $digits > $ldigits[$j];
+
+         $lout .= "\t$value";
+      }
+      $lout =~ s/^\s+//;
+      $input[$i] = $lout;
+      $i++ if $textnext;
+      #print "$input[$i]\n";
+      #if ($textnext) {
+      #   print "$input[$i+1]\n";
+      #   $i++;
+      #}
+   }
+
+   # Add spaces before values to match column lenghts before decimal.
+
+   for ($i=0; $i<@input; $i++) {
+      $line = $input[$i];
+      if ($line =~ /^\s*t/i) {
+         $textnext = 1;
+      } else {
+         $textnext = 0;
+         if ($line !~ /^\s*\d/) {
+            next;
+         }
+      }
+      $line =~ s/^\s+//;
+      $line =~ s/\s+$//;
+      @data = split(/\s+/, $line);
+      $lout = "";
+      for ($j=0; $j<@data; $j++) {
+         $value = $data[$j];
+         $value =~ /([-\d]+)\.?$/;
+         $tval = $value;
+         $tval =~ s/\..*//;
+         $digits = length($tval);
+
+         $add = $ldigits[$j] - $digits;
+         for ($k=0; $k<$add; $k++) {
+            if ($j == 0) {
+               $value .= " ";
+            } else {
+               $value = " $value";
+            }
+         }
+         $lout .= "\t$value";
+      }
+      $lout =~ s/^\t+//;
+      $input[$i] = $lout;
+      $i++ if $textnext;
+      #print "$input[$i]\n";
+      #if ($textnext) {
+      #   print "$input[$i+1]\n";
+      #   $i++;
+      #}
+   }
+
+   return @input;
+}
+
+
+
+##############################
+##
+## getMaxFractionalDigits --
+##
+
+sub getMaxFractionalDigits {
+   my ($value, $fracdig) = @_;
+   $fracdig = 0 if $fracdig =~ /^\s*$/;
+
+   my $digits = 0;
+
+   if ($value !~ /\./) {
+      # no fractional digits
+      return $fracdig;
+   }
+
+   $value =~ s/.*\.//;
+   $digits = length($value);
+ 
+   if ($digits > $fracdig) {
+      return $digits;
+   } else {
+      return $fracdig;
+   }
+}
+
+
