@@ -1,4 +1,4 @@
-The _prettypmx_ PERL script aligns parameter matrices of SCORE PMX
+The [_prettypmx_](https://github.com/craigsapp/prettypmx/blob/master/prettypmx) PERL script aligns parameter matrices of SCORE PMX
 data.  Trailing zeros in fractional portions of numbers are adjusted
 so that each column contains the same number of fractional digits
 (for readability and compactness).
