@@ -1,4 +1,4 @@
-The prettypmx PERL script aligns parameter matrices of SCORE PMX
+The _prettypmx_ PERL script aligns parameter matrices of SCORE PMX
 data.  Trailing zeros in fractional portations are adjusted so that
 each column contains the same number of fractional digits (for
 readability and compactness).
