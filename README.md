@@ -1,7 +1,7 @@
 The _prettypmx_ PERL script aligns parameter matrices of SCORE PMX
-data.  Trailing zeros in fractional portations are adjusted so that
-each column contains the same number of fractional digits (for
-readability and compactness).
+data.  Trailing zeros in fractional portions of numbers are adjusted
+so that each column contains the same number of fractional digits
+(for readability and compactness).
 
 Example input:
 
@@ -52,3 +52,31 @@ Both the example input and output PMX data will produce this image in the SCORE 
 <center>
 ![Example notation](example/example.png?raw=true)
 </center>
+
+The _prettypmx_ program accepts one option (-s) which can change
+the spacing between columns to something other than a single space.
+Here is an example placing three spaces between columns:
+
+<pre>prettypmx -s "   " input.pmx > output2.pmx</pre>
+
+<pre>
+8    1    0.000    0    0.6   41.70
+3    1    1.200    0    1.0
+18   1    5.700    0   99.0    1.00
+1    1   11.640    8   20.0    0.00    1.0
+1    1   11.640   12   10.0    0.00    1.0   -1.5
+14   1   15.788    2
+1    1   17.618   11   20.0    0.00    1.0
+1    1   17.620   11   10.0    0.00    0.5   -1.0
+6    1   17.620   10    9.0   21.76   11.0
+1    1   21.758   10   12.0    0.00    0.5   -1.0
+1    1   25.897    4   20.0    0.00    1.0   -1.5
+1    1   25.900    9   12.0    0.00    1.0   -1.0
+1    1   33.027    8   20.0    0.00    1.0    0.0   0   0   -14
+1    1   33.028   10   10.0    0.00    1.0   -1.5
+1    1   37.552    7   20.0    0.00    1.0
+1    1   37.553   12   10.0    0.00    1.0   -1.5
+14   1   41.700    2
+</pre>
+
+

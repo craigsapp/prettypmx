@@ -59,9 +59,15 @@
 #
 
 use strict;
+use Getopt::Long;
 
 # $COLUMNSPACE is the text which separates each column of parameters.
 my $COLUMNSPACE = " ";
+Getopt::Long::Configure("bundling");
+GetOptions (
+   's|space|spacer=s' => \$COLUMNSPACE
+);
+$COLUMNSPACE = " " if $COLUMNSPACE eq "";
 
 my @contents = <>;
 @contents = cleanContents(@contents);
