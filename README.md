@@ -53,7 +53,7 @@ Both the example input and output PMX data will produce this image in the SCORE 
 ![Example notation](example/example.png?raw=true)
 </center>
 
-The _prettypmx_ program accepts one option (-s) which can change
+The _prettypmx_ program accepts one option (-s) that can change
 the spacing between columns to something other than a single space.
 Here is an example placing three spaces between columns:
 
@@ -80,7 +80,7 @@ Here is an example placing three spaces between columns:
 </pre>
 
 Text for code 16 items will not be altered.  For example, below is output 
-from prettypmx which adds two spaces between columns.  Note that the text
+from _prettypmx_ that adds two spaces between columns.  Note that the text
 "Allegro ma non troppo" retains single space between the words.
 
 <pre>
