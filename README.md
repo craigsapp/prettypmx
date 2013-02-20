@@ -50,5 +50,5 @@ Example output:
 Both the example input and output PMX data will produce this image in the SCORE editor:
 
 <center>
-![Example Figure](example/example.svg?raw=true)
+![Example notation](example/example.png?raw=true)
 </center>
