@@ -46,3 +46,11 @@ Example output:
 1  1 37.553 12 10.0  0.00  1.0 -1.5
 14 1 41.700
 </pre>
+
+Both the example input and output PMX data will produce this image in the SCORE editor:
+
+<center>
+![IMAGE](example/example.svg?raw=true)
+</center>
+
+
