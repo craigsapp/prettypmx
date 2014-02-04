@@ -3,6 +3,7 @@
 # Programmer:    Craig Stuart Sapp <craig.stanford.edu>
 # Creation Date: Sat Feb 25 09:10:04 PST 2012
 # Last Modified: Sat Feb 25 09:10:04 PST 2012
+# Last Modified: Tue Feb  4 12:47:54 PST 2014 Added -m option.
 # Filename:      prettypmx
 # Syntax:        perl 5
 #
@@ -63,14 +64,21 @@ use Getopt::Long;
 
 # $COLUMNSPACE is the text which separates each column of parameters.
 my $COLUMNSPACE = " ";
+my $minimalQ = 0;
 Getopt::Long::Configure("bundling");
 GetOptions (
-   's|space|spacer=s' => \$COLUMNSPACE
+   's|space|spacer=s' => \$COLUMNSPACE,
+   'm|minimal' => \$minimalQ
 );
 $COLUMNSPACE = " " if $COLUMNSPACE eq "";
 
 my @contents = <>;
-@contents = cleanContents(@contents);
+
+if ($minimalQ) {
+   @contents = cleanContentsMinimal(@contents);
+} else {
+   @contents = cleanContents(@contents);
+}
 
 my $i;
 my $j;
@@ -102,6 +110,106 @@ for ($i=0; $i<@contents; $i++) {
 }
 
 ################################################################################
+
+
+##############################
+##
+## cleanContentsMinimal -- Remove all trailing zeros in fractional digits,
+##      and do not pad with extra spaces on either side of the number to
+##      align all columns.
+##
+
+sub cleanContentsMinimal {
+   my @input = @_;
+   my @output;
+
+   my $i;
+   my $j;
+   my $textnext;
+   my $line;
+   my @data;
+   my $value;
+   my $lout;
+
+   for ($i=0; $i<@input; $i++) {
+      $line = $input[$i];
+      chomp $line;
+      if ($line =~ /^\s*t\s/i) {
+         $textnext = 1;
+      } else {
+         $textnext = 0;
+         if ($line !~ /^\s*\d/) {
+            $line =~ s/\s+$//;
+            $input[$i] = $line;
+            next;
+         }
+      }
+      $line =~ s/^\s+//;
+      $line =~ s/\s+$//;
+      @data = split(/\s+/, $line);
+      $lout = "";
+      for ($j=0; $j<@data; $j++) {
+         $value = $data[$j];
+         if ($value =~ /t/i) {
+            $lout .= "\t$value";
+         } else  {
+            if ($value =~ /^\./) {
+               $value = "0$value";
+            } elsif ($value =~ /^-\./) {
+               $value =~ s/^-\.//;
+               $value = "-0.$value";
+            }
+            if ($value =~ /\./) {
+               # remove trailing zeros after decimal point
+               $value =~ s/0+$//;
+            }
+            # remove decimal point if an integer
+            $value =~ s/\.$//;
+
+            $lout .= "\t$value";
+         }
+      }
+      $lout =~ s/^\s+//;
+      $input[$i] = $lout;
+      if ($textnext) {
+         $input[$i+1] =~ s/[\r\n]+$//;
+         $i++;
+      }
+   }
+
+   for ($i=0; $i<@input; $i++) {
+      $line = $input[$i];
+      chomp $line;
+      if ($line =~ /^\s*t/i) {
+         $textnext = 1;
+      } else {
+         $textnext = 0;
+         if ($line !~ /^\s*\d/) {
+            next;
+         }
+      }
+      $line =~ s/^\s+//;
+      $line =~ s/\s+$//;
+      @data = split(/\s+/, $line);
+      for ($j=$#data; $j>=1; $j--) {
+         if ($data[$j] == 0) {
+            pop(@data);
+         } else {
+            last;
+         }
+      }
+      $lout = "";
+      for ($j=0; $j<@data; $j++) {
+         $lout .= "\t$data[$j]";
+      }
+      $lout =~ s/^\t//;
+      $input[$i] = $lout;
+      $i++ if $textnext;
+   }
+
+   return @input;
+}
+
 
 
 ##############################
@@ -166,7 +274,7 @@ sub cleanContents {
       }
    }
 
-   # Remove trailing zeros but keep at least the first four values.
+   # Remove trailing zeros but keep at least the first two values.
 
    for ($i=0; $i<@input; $i++) {
       $line = $input[$i];
@@ -182,7 +290,7 @@ sub cleanContents {
       $line =~ s/^\s+//;
       $line =~ s/\s+$//;
       @data = split(/\s+/, $line);
-      for ($j=$#data; $j>=4; $j--) {
+      for ($j=$#data; $j>=1; $j--) {
          if ($data[$j] == 0) {
             pop(@data);
          } else {
