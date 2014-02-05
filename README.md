@@ -53,7 +53,7 @@ Both the example input and output PMX data will produce this image in the SCORE 
 ![Example notation](example/example.png?raw=true)
 </center>
 
-The _prettypmx_ program accepts one option (-s) that can change
+The _prettypmx_ program accepts an option (-s) that can change
 the spacing between columns to something other than a single space.
 Here is an example placing three spaces between columns:
 
@@ -79,6 +79,33 @@ Here is an example placing three spaces between columns:
 14   1   41.700    2
 </pre>
 
+
+Another option (-m) is used to give a minimal spacing of numbers on a line, 
+although this will typically cause the parameter columns to not be aligned:
+
+<pre>prettypmx -m input.pmx > output2b.pmx</pre>
+
+<pre>
+8 1 0 0 0.6 41.7
+3 1 1.2 0 1
+18 1 5.7 0 99 1
+1 1 11.64 8 20 0 1
+1 1 11.64 12 10 0 1 -1.5
+14 1 15.788 2
+1 1 17.618 11 20 0 1
+1 1 17.62 11 10 0 0.5 -1
+6 1 17.62 10 9 21.76 11
+1 1 21.758 10 12 0 0.5 -1
+1 1 25.897 4 20 0 1 -1.5
+1 1 25.9 9 12 0 1 -1
+1 1 33.027 8 20 0 1 0 0 0 -14
+1 1 33.028 10 10 0 1 -1.5
+1 1 37.552 7 20 0 1
+1 1 37.553 12 10 0 1 -1.5
+14 1 41.7 2
+</pre>
+
+
 Text for code 16 items will not be altered.  For example, below is output 
 from _prettypmx_ that adds two spaces between columns.  Note that the text
 "Allegro ma non troppo" retains single space between the words.
@@ -101,5 +128,6 @@ _00Allegro ma non troppo
 1   6  82.388   9.000  10.0   0.000   0.25  -1.00
 2   6  86.840   0.000   0.0   0.000   1.00
 </pre>
+
 
 
